@@ -1,3 +1,4 @@
+docker/settings.local.php
 web/
 docker-compose.override.yml
 drupal.make

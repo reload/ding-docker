@@ -18,6 +18,11 @@ $conf['block_cache'] = 1;
 $conf['preprocess_css'] = 1;
 $conf['preprocess_js'] = 1;
 
+
+if (file_exists(__DIR__ . '/settings.local.php')) {
+  include __DIR__ . '/settings.local.php';
+}
+
 // // Ensures that form data is not moved out of the database. It's important to
 // // keep this in non-volatile memory (e.g. the database).
 // $conf['cache_class_cache_form'] = 'DrupalDatabaseCache';

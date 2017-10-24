@@ -5,15 +5,19 @@ web:
     - '443/tcp'
   volumes:
     - './web:/var/www/html'
+    - './drupal.make:/var/www/html/drupal.make'
     - './docker/settings.php:/var/www/html/sites/default/settings.php:ro'
+    - './docker/settings.local.php:/var/www/html/sites/default/settings.local.php:ro'
     - './docker/drupal-cron.conf:/etc/cron.d/drupal-cron.conf:ro'
     - './docker/prepare-environment.sh:/etc/my_init.d/prepare-environment.sh'
     - './docker/php.ini:/etc/php/5.6/mods-available/ding.ini'
+    - "${SSH_AUTH_SOCK}:/tmp/ssh-agent"
   links:
     - db
     - memcached
   environment:
-    PHP_EXTRA_EXTENSIONS: memcached
+    PHP_EXTRA_EXTENSIONS: msgpack igbinary memcached
+    SSH_AUTH_SOCK: /tmp/ssh-agent
   working_dir: /var/www/html
 db:
   image: mariadb
@@ -26,16 +30,9 @@ db:
     MYSQL_PASSWORD: ichai4IesaeSainohV0oT2ca9hooNi
 gulp:
   image: node:argon
-  volumes_from:
-    - web
-  entrypoint: "/bin/sh -c 'cd /var/www/html/profiles/ding2/themes/ddbasic && npm install --unsafe-perm && node_modules/.bin/gulp watch'"
-drush:
-  image: drush/drush
-  links:
-    - db
-  volumes_from:
-    - web
-  working_dir: /var/www/html
+  volumes:
+    - './web/profiles/ding2/themes/ddbasic:/src'
+  entrypoint: "/bin/sh -c 'cd /src && npm install --unsafe-perm && node_modules/.bin/gulp sass'"
 memcached:
   image: memcached
 varnish:
