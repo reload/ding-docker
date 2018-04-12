@@ -26,13 +26,13 @@ services:
     environment:
       PATH: '/var/www/vendor/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
       PHP_SENDMAIL_PATH: /usr/local/bin/mhsendmail --smtp-addr="mailhog:1025"
-      PHP_EXTRA_EXTENSIONS: 'memcache'
+      PHP_EXTRA_EXTENSIONS: msgpack igbinary memcached
       BEHAT_PARAMS: '{"extensions" : {"Behat\\MinkExtension" : {"base_url" : "http://web/", "selenium2" : { "wd_host" : "http://selenium-hub:4444/wd/hub" } } } }'
     volumes_from:
       - webroot
     volumes:
       - './docker/drupal-cron.conf:/etc/cron.d/drupal-cron.conf:ro'
-      - './docker/php.ini:/etc/php/5.6/mods-available/ding.ini'
+      - './docker/php.ini:/etc/php/7.0/mods-available/ding.ini'
       - './docker/prepare-environment.sh:/etc/my_init.d/prepare-environment.sh'
     working_dir: /var/www/web
     links:
@@ -66,16 +66,6 @@ services:
       - webroot
     entrypoint: "/bin/sh -c 'cd /var/www/web/profiles/ding2/themes/ddbasic && npm install && node_modules/.bin/gulp watch'"
     user: root
-
-  drush:
-    image: drush/drush:8
-    links:
-      - db
-    volumes_from:
-      - webroot
-    volumes:
-      - drush-cache:/root/.drush    
-    working_dir: /var/www/web
 
   memcached:
     image: memcached
