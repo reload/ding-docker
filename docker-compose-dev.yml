@@ -1,9 +1,10 @@
-version: "2"
+version: '2'
 services:
   webroot:
     volumes:
       - 'ding2-webroot-sync:/var/www/web:nocopy'
       - './docker/docker.settings.php:/var/www/web/sites/default/settings.php:delegated'
+
   php:
     environment:
       XDEBUG_CONFIG: "remote_connect_back=0 remote_host=docker.for.mac.localhost"

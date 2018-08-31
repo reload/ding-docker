@@ -68,17 +68,15 @@ Note that you may have to clear the cache, download new dependencies or even rei
 
 Running the install profile can sometimes be tricky.
 
-The sure-fire way (especially on Mac) is to run the install script through the browser: 
+The sure-fire way (especially on Mac) is to run the install script through the browser:
 http://local.docker/install.php (Use the ding2 profile)
 
 Notice: This way can be pretty slow.
 
 
-A faster, but not-so-sure way is to run the install-script through Drush:
-
-From inside the docker web containers document root (`/var/www/html`) do:
+A faster way is to run the install-script through Drush inside the `php` container:
 ```sh
-% drush site-install ding2
+% docker-compose exec php drush site-install ding2
 ```
 
 ## Stuff not polished yet

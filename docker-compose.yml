@@ -1,4 +1,4 @@
-version: "2"
+version: '2'
 services:
   # Webroot container shared between the web, php, gulp and drush containers.
   webroot:
@@ -6,6 +6,7 @@ services:
     volumes:
       - './web:/var/www/web'
       - './docker/docker.settings.php:/var/www/web/sites/default/settings.php:cached'
+
   web:
     image: reload/drupal-apache-fpm
     ports:
@@ -26,13 +27,14 @@ services:
     environment:
       PATH: '/var/www/vendor/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
       PHP_SENDMAIL_PATH: /usr/local/bin/mhsendmail --smtp-addr="mailhog:1025"
-      PHP_EXTRA_EXTENSIONS: 'memcache'
+      PHP_EXTRA_EXTENSIONS: msgpack igbinary memcached
     volumes_from:
       - webroot
     volumes:
       - './docker/drupal-cron.conf:/etc/cron.d/drupal-cron.conf:ro'
-      - './docker/php.ini:/etc/php/5.6/mods-available/ding.ini'
+      - './docker/php.ini:/etc/php/7.0/mods-available/ding.ini'
       - './docker/prepare-environment.sh:/etc/my_init.d/prepare-environment.sh'
+      - drush-cache:/root/.drush
     working_dir: /var/www/web
     links:
       - db
@@ -54,10 +56,10 @@ services:
 
   # Mailcapture with a webinterface.
   mailhog:
-      image: mailhog/mailhog
-      # Web-inteface exposed on mail.ding2.docker
-      environment:
-        VIRTUAL_HOST: mail.ding2.docker
+    image: mailhog/mailhog
+    # Web-interface exposed on mail.ding2.docker
+    environment:
+      VIRTUAL_HOST: mail.ding2.docker
 
   gulp:
     image: node:argon
@@ -65,16 +67,6 @@ services:
       - webroot
     entrypoint: "/bin/sh -c 'cd /var/www/web/profiles/ding2/themes/ddbasic && npm install && node_modules/.bin/gulp watch'"
     user: root
-
-  drush:
-    image: drush/drush:8
-    links:
-      - db
-    volumes_from:
-      - webroot
-    volumes:
-      - drush-cache:/root/.drush    
-    working_dir: /var/www/web
 
   memcached:
     image: memcached
