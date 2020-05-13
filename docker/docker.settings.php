@@ -13,10 +13,11 @@ $databases = array(
   ),
 );
 
-$conf['cache'] = 1;
-$conf['block_cache'] = 1;
-$conf['preprocess_css'] = 1;
-$conf['preprocess_js'] = 1;
+$conf['cache'] = 0;
+$conf['block_cache'] = 0;
+$conf['preprocess_css'] = 0;
+$conf['preprocess_js'] = 0;
+$conf['theme_debug'] = 1;
 
 // // Ensures that form data is not moved out of the database. It's important to
 // // keep this in non-volatile memory (e.g. the database).
