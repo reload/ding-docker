@@ -17,37 +17,34 @@ Clone this repository
 % cd ding-docker
 ```
 
-Get a ding make file
+### Make sure you have a local drush that is BELOW version 9.
+This is necessary, as the ding2 project uses .make files, which became unsupported in Drush 9.
+
+Setup the .make files:
 ```sh
-% curl -LOSs https://raw.github.com/ding2/ding2/master/drupal.make
+$ make drush-make
 ```
 
-Build the site with drush make:
+If you have an existing project, with a drupal core, you can use this:
 ```sh
-% drush make --contrib-destination=profiles/ding2/ drupal.make web --working-copy
+$ make drush-remake
 ```
 
-### Then you can start the Docker containers:
-
-If you're using docker-sync for Mac, you can use:
-
+### Using NFS with Docker for Mac
+This project is NFS enabled. You need to copy over the override file for it to work:
 ```sh
-% docker-sync-stack start
+$ cp docker-compose.mac-nfs.yml docker-compose.override.yml
 ```
 
-otherwise, you can use vanilla docker-compose:
-
+### Starting the docker and drupal setup:
+"I want everything to be reset, and I dont care about losing any data":
 ```sh
-% docker-compose up
+$ make reset
 ```
 
-You should then be able to access the site.
-
-If the site does not look right then run:
-
+"I want to just bring the containers up again":
 ```sh
-% docker-compose exec php drush css-generate
-% docker-compose exec php drush cc all
+$ make up
 ```
 
 ### Using a custom version of the codebase

@@ -1,4 +1,14 @@
-web/
 docker-compose.override.yml
-drupal.make
 .docker-sync
+
+# Ignore the web folder that drush make builds
+web/
+
+# Ignore the ding2 make files + patches
+patches/
+drupal.make
+project.make
+project-core.make
+
+# Ignore make/docker-compose last pull stamp.
+/.last-pull-*
