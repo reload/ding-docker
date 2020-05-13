@@ -10,6 +10,7 @@ services:
     image: reload/drupal-apache-fpm
     ports:
       - '80'
+      - '443'
     volumes_from:
       - webroot
     environment:
