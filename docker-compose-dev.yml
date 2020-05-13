@@ -8,6 +8,11 @@ services:
     environment:
       XDEBUG_CONFIG: "remote_connect_back=0 remote_host=docker.for.mac.localhost"
 
+  web:
+    environment:
+      VIRTUAL_HOST: ding2.docker
+      VIRTUAL_PROTO: https
+
 volumes:
   ding2-webroot-sync:
     external: true

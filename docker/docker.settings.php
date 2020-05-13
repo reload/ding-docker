@@ -26,10 +26,10 @@ $conf['preprocess_js'] = 1;
 // drupal_fast_404();
 
 // // Tell Drupal it's behind a proxy.
-// $conf['reverse_proxy'] = TRUE;
+$conf['reverse_proxy'] = TRUE;
 
 // // Tell Drupal what addresses the proxy server(s) use.
-// $conf['reverse_proxy_addresses'] = array('127.0.0.1');
+$conf['reverse_proxy_addresses'] = array('127.0.0.1');
 
 // // Bypass Drupal bootstrap for anonymous users so that Drupal sets max-age < 0.
 // $conf['page_cache_invoke_hooks'] = FALSE;
