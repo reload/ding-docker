@@ -13,8 +13,8 @@ This project assumes that the following software is installed and working on you
 
 Clone this repository
 ```sh
-% git clone https://github.com/reload/ding-docker.git
-% cd ding-docker
+$ git clone https://github.com/reload/ding-docker.git
+$ cd ding-docker
 ```
 
 ### Make sure you have a local drush that is BELOW version 9.
@@ -31,7 +31,9 @@ $ make drush-remake
 ```
 
 ### Using NFS with Docker for Mac
-This project is NFS enabled. You need to copy over the override file for it to work:
+This project is Mac NFS enabled. You need to copy over the override file for it to work:
+[Reloaders can find a guide on how to set up NFS here](https://reload.atlassian.net/wiki/spaces/RW/pages/153288705/Docker+for+Mac#DockerforMac-5.NFS)
+
 ```sh
 $ cp docker-compose.mac-nfs.yml docker-compose.override.yml
 ```
@@ -47,26 +49,31 @@ $ make reset
 $ make up
 ```
 
+### You should now have a local site available
+Assuming you're using [dory](https://github.com/FreedomBen/dory), you can visit it at https://ding2.docker
+
+Otherwise, you need to visit it using localhost:XXXX. 
+You can find the port using `$ docker-compose ps` and seeing what `web` is set to.
+
 ### Using a custom version of the codebase
 
-To use a custom version of the code base then first complete the steps above. add your fork as a remote to the profile and checkout your branch:
+To use a custom version of the code base then first complete the steps above.
+To use this fork as your origin with the ding2/ding2 as your upstream, do this:
 
 ```sh
-% cd web/profiles/ding2
-% git remote add [remote name] [remote repository url]
-% git fetch [remote name]
-% git checkout -t [remote name]/[remote branch]
+$ cd web/profiles/ding2
+$ git remote add origin git@github.com:reload/ding2.git
+$ git remote add upstream git@github.com:ding2/ding2.git
+$ git fetch origin
+$ git fetch upstream
+$ git checkout master
 ```
 
-In the following example we work with the `master` branch from the Reload fork of Ding2:
-
+and then, if you want to make sure that the origin (reload/ding2) is up to date with upstream (ding2/ding2):
 ```sh
-% cd web/profiles/ding2
-% git remote add reload git@github.com:reload/ding2.git
-% git fetch reload
-% git checkout -t reload/master
+$ git rebase upstream/master
+$ git push origin master
 ```
-
 
 Note that you may have to clear the cache, download new dependencies or even reinstall the site to make the changes take effect.
 
@@ -86,10 +93,9 @@ A faster, but not-so-sure way is to run the install-script through Drush:
 
 From inside the docker web containers document root (`/var/www/html`) do:
 ```sh
-% drush site-install ding2
+$ drush site-install ding2
 ```
 
 ## Stuff not polished yet
 
 * varnish only one way
-* the drush container does not have access to the SOAP connection that the web container has. This makes it fail on site-install sometimes
