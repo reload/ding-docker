@@ -36,12 +36,19 @@ time docker-compose exec fpm sh -c  "\
   && echo ' * Waiting for the database to be available' \
   && wait-for-it -t 60 db:3306 \
   && echo 'Site reset' \
-  && echo ' * Update database' \
+  && echo ' * Update database (drush -y updatedb)' \
   && drush -y updatedb \
-  && echo ' * Cache clear' \
+  && echo ' * Cache clear (drush cc all)' \
   && drush cc all \
-  && echo ' * drush css-generate.' \
+  && echo ' * Generate the variable-based CSS. (drush css-generate).' \
   && drush css-generate \
-  && echo ' * Cache clear' \
+  && echo ' * Enable Connie opensearch tokens (drush en -y connie_openplatform_token).' \
+  && drush en -y connie_openplatform_token \
+  && echo ' * Cache clear (drush cc all)' \
   && drush cc all
   "
+
+echo "You now have a blank site. You can install example content using:"
+echo "$ make install-example-content"
+echo ""
+echo "Notice: you *may* need a VPN for some aspects of opensearch to work."
