@@ -9,17 +9,20 @@ help: ## Display a list of the public targets
 # targets), then strip the hash and print.
 	@grep -E -h "^\w.*:.*##" $(MAKEFILE_LIST) | sed -e 's/\(.*\):.*##\(.*\)/\1	\2/'
 
-drush-make-download: ## Get .make files from ding2/ding2.
+setup-git-remotes: ## Setting up the git remotes inside web/profiles/ding2.
+	cd web/profiles/ding2 && git remote add origin git@github.com:reload/ding2.git && git remote add upstream git@github.com:ding2/ding2.git && git fetch origin && git fetch upstream && git checkout master
+
+drush-make-download: ## Get .make files from ding2/ding2. Requires SVN.
 	rm -rf patches
 	curl -LOSs https://raw.github.com/ding2/ding2/master/project-core.make
 	curl -LOSs https://raw.github.com/ding2/ding2/master/project.make
 	svn export https://github.com/ding2/ding2.git/trunk/patches
 
-drush-make: drush-make-download ## Get .make files from ding2/ding2 and install them.
+drush-make: drush-make-download ## Get .make files from ding2/ding2 and install them.  Requires SVN.
 	drush make --contrib-destination=profiles/ding2/ project-core.make web --working-copy
 	drush make --contrib-destination=profiles/ding2/ project.make web --working-copy --no-core
 
-drush-remake: drush-make-download ## Re-install .make files in an existing project. Notice: This only works in a project that already has a Drupal core.
+drush-remake: drush-make-download ## Re-install .make files in an existing project. Notice: This only works in a project that already has a Drupal core.  Requires SVN.
 	drush make --contrib-destination=profiles/ding2/ project-core.make web --working-copy --no-core
 	drush make --contrib-destination=profiles/ding2/ project.make web --working-copy --no-core
 

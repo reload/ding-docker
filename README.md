@@ -20,6 +20,9 @@ $ cd ding-docker
 ### Make sure you have a local drush that is BELOW version 9.
 This is necessary, as the ding2 project uses .make files, which became unsupported in Drush 9.
 
+**Notice** 
+You'll also need SVN to use the drush-make / drush-remake commands below.
+
 Setup the .make files:
 ```sh
 $ make drush-make
@@ -59,6 +62,12 @@ You can find the port using `$ docker-compose ps` and seeing what `web` is set t
 
 To use a custom version of the code base then first complete the steps above.
 To use this fork as your origin with the ding2/ding2 as your upstream, do this:
+
+```sh
+$ make setup-git-remotes
+``
+
+If you prefer to do it manually (Because git is a cruel mistress):
 
 ```sh
 $ cd web/profiles/ding2
