@@ -27,7 +27,7 @@ drush-remake: drush-make-download ## Re-install .make files in an existing proje
 	drush make --contrib-destination=profiles/ding2/ project.make web --working-copy --no-core
 
 install-example-content:
-	docker-compose exec fpm sh -c "drush en -y ding_example_content ding_example_content_events ding_example_content_frontpage ding_example_content_groups ding_example_content_news"
+	docker-compose exec fpm sh -c "drush en -y ding_example_content ding_example_content_events ding_example_content_frontpage ding_example_content_groups ding_example_content_news ting_covers_placeholder"
 
 reset: _reset-container-state ## Stop all containers, reset their state and start up again.
 
