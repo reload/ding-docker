@@ -13,63 +13,76 @@ This project assumes that the following software is installed and working on you
 
 Clone this repository
 ```sh
-% git clone https://github.com/reload/ding-docker.git
-% cd ding-docker
+$ git clone https://github.com/reload/ding-docker.git
+$ cd ding-docker
 ```
 
-Get a ding make file
+### Make sure you have a local drush that is BELOW version 9.
+This is necessary, as the ding2 project uses .make files, which became unsupported in Drush 9.
+
+**Notice** 
+You'll also need SVN to use the drush-make / drush-remake commands below.
+
+Setup the .make files:
 ```sh
-% curl -LOSs https://raw.github.com/ding2/ding2/master/drupal.make
+$ make drush-make
 ```
 
-Build the site with drush make:
+If you have an existing project, with a drupal core, you can use this:
 ```sh
-% drush make --contrib-destination=profiles/ding2/ drupal.make web --working-copy
+$ make drush-remake
 ```
 
-### Then you can start the Docker containers:
-
-If you're using docker-sync for Mac, you can use:
-
-```sh
-% docker-sync-stack start
-```
-
-otherwise, you can use vanilla docker-compose:
-
-```sh
-% docker-compose up
-```
-
-You should then be able to access the site.
-
-If the site does not look right then run:
+### Using NFS with Docker for Mac
+This project is Mac NFS enabled. You need to copy over the override file for it to work:
+[Reloaders can find a guide on how to set up NFS here](https://reload.atlassian.net/wiki/spaces/RW/pages/153288705/Docker+for+Mac#DockerforMac-5.NFS)
 
 ```sh
-% docker-compose exec php drush css-generate
-% docker-compose exec php drush cc all
+$ cp docker-compose.mac-nfs.yml docker-compose.override.yml
 ```
+
+### Starting the docker and drupal setup:
+"I want everything to be reset, and I dont care about losing any data":
+```sh
+$ make reset
+```
+
+"I want to just bring the containers up again":
+```sh
+$ make up
+```
+
+### You should now have a local site available
+Assuming you're using [dory](https://github.com/FreedomBen/dory), you can visit it at https://ding2.docker
+
+Otherwise, you need to visit it using localhost:XXXX. 
+You can find the port using `$ docker-compose ps` and seeing what `web` is set to.
 
 ### Using a custom version of the codebase
 
-To use a custom version of the code base then first complete the steps above. add your fork as a remote to the profile and checkout your branch:
+To use a custom version of the code base then first complete the steps above.
+To use this fork as your origin with the ding2/ding2 as your upstream, do this:
 
 ```sh
-% cd web/profiles/ding2
-% git remote add [remote name] [remote repository url]
-% git fetch [remote name]
-% git checkout -t [remote name]/[remote branch]
-```
+$ make setup-git-remotes
+``
 
-In the following example we work with the `master` branch from the Reload fork of Ding2:
+If you prefer to do it manually (Because git is a cruel mistress):
 
 ```sh
-% cd web/profiles/ding2
-% git remote add reload git@github.com:reload/ding2.git
-% git fetch reload
-% git checkout -t reload/master
+$ cd web/profiles/ding2
+$ git remote add origin git@github.com:reload/ding2.git
+$ git remote add upstream git@github.com:ding2/ding2.git
+$ git fetch origin
+$ git fetch upstream
+$ git checkout master
 ```
 
+and then, if you want to make sure that the origin (reload/ding2) is up to date with upstream (ding2/ding2):
+```sh
+$ git rebase upstream/master
+$ git push origin master
+```
 
 Note that you may have to clear the cache, download new dependencies or even reinstall the site to make the changes take effect.
 
@@ -89,10 +102,9 @@ A faster, but not-so-sure way is to run the install-script through Drush:
 
 From inside the docker web containers document root (`/var/www/html`) do:
 ```sh
-% drush site-install ding2
+$ drush site-install ding2
 ```
 
 ## Stuff not polished yet
 
 * varnish only one way
-* the drush container does not have access to the SOAP connection that the web container has. This makes it fail on site-install sometimes

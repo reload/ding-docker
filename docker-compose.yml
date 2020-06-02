@@ -1,42 +1,43 @@
-version: "2"
+version: '3'
+
 services:
-  # Webroot container shared between the web, php, gulp and drush containers.
-  webroot:
-    image: tianon/true
-    volumes:
-      - './web:/var/www/web'
-      - './docker/docker.settings.php:/var/www/web/sites/default/settings.php:cached'
   web:
-    image: reload/drupal-apache-fpm
+    image: reload/drupal-apache-fpm:latest
     ports:
       - '80'
-    volumes_from:
-      - webroot
+      - '443'
+    depends_on:
+      - fpm
+    volumes:
+      - 'projectroot:/var/www/'
+      - '${HOME}/.local/share/mkcert:/mkcert:ro'
+      - '${HOME}/.local/share/dev_certificates:/cert:rw'
     environment:
+      # Ensure dory redirects from http to https. We want to nag
+      # people into doing development on valid HTTPS.
+      HTTPS_METHOD: redirect
+      # Ensure dory/nginx-proxy goes via port 80.
+      VIRTUAL_PORT: '80'
       VIRTUAL_HOST: ding2.docker
-    # The drupal-apache-fpm image expects the container that runs fpm to be
-    # available as "fpm" so we alias our link to the php container.
-    links:
-      - php:fpm
+      MKCERT_DOMAINS: "ding2.docker mail.ding2.docker"
+      DRUSH_OPTIONS_URI: https://ding2.docker
 
-  php:
+  fpm:
     image: reload/drupal-php7-fpm:7.0
     ports:
       - '9000'
-    environment:
-      PATH: '/var/www/vendor/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-      PHP_SENDMAIL_PATH: /usr/local/bin/mhsendmail --smtp-addr="mailhog:1025"
-      PHP_EXTRA_EXTENSIONS: 'memcache'
-    volumes_from:
-      - webroot
-    volumes:
-      - './docker/drupal-cron.conf:/etc/cron.d/drupal-cron.conf:ro'
-      - './docker/php.ini:/etc/php/5.6/mods-available/ding.ini'
-      - './docker/prepare-environment.sh:/etc/my_init.d/prepare-environment.sh'
-    working_dir: /var/www/web
-    links:
+    depends_on:
       - db
       - memcached
+    working_dir: /var/www/web
+    volumes:
+      - 'projectroot:/var/www/'
+      - './docker/my_init.d/install-cron.sh:/etc/my_init.d/install-cron.sh'
+    environment:
+      PATH: '/var/www/vendor/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+      DRUSH_OPTIONS_URI: https://ding2.docker
+      PHP_SENDMAIL_PATH: /usr/local/bin/mhsendmail --smtp-addr="mailhog:1025"
+      PHP_EXTRA_EXTENSIONS: 'memcache'
 
   db:
     image: ding2/ding2-mysql:master
@@ -54,32 +55,31 @@ services:
 
   # Mailcapture with a webinterface.
   mailhog:
-      image: mailhog/mailhog
-      # Web-inteface exposed on mail.ding2.docker
-      environment:
-        VIRTUAL_HOST: mail.ding2.docker
-
-  gulp:
-    image: node:argon
-    volumes_from:
-      - webroot
-    entrypoint: "/bin/sh -c 'cd /var/www/web/profiles/ding2/themes/ddbasic && npm install && node_modules/.bin/gulp watch'"
-    user: root
-
-  drush:
-    image: drush/drush:8
-    links:
-      - db
-    volumes_from:
-      - webroot
-    volumes:
-      - drush-cache:/root/.drush
-    working_dir: /var/www/web
+    image: mailhog/mailhog
+    # Web-inteface exposed on mail.ding2.docker
+    environment:
+      VIRTUAL_HOST: mail.ding2.docker
 
   memcached:
     image: memcached
     ports:
       - '11211'
 
+  gulp:
+    image: node:argon
+    volumes:
+      - 'cache:/npm-cache'
+      - 'projectroot:/var/www/'
+    entrypoint: "/bin/sh -c 'cd /var/www/web/profiles/ding2/themes/ddbasic && npm install --no-optional && node_modules/.bin/gulp watch'"
+    user: root
+
 volumes:
-  drush-cache:
+  # NPM cache that survives docker-reset.sh
+  cache:
+  db-data:
+  projectroot:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${PWD}
+      o: bind
