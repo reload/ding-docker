@@ -14,7 +14,7 @@ help: ## Display a list of the public targets
 setup-git-remotes: ## Setting up the git remotes inside web/profiles/ding2.
 	cd web/profiles/ding2 && git remote add origin git@github.com:reload/ding2.git && git remote add upstream git@github.com:ding2/ding2.git && git fetch origin && git fetch upstream && git checkout master
 
-vendor/bin/drush: composer.lock
+vendor/bin/drush: composer.json composer.lock
 	composer install
 
 .PHONY: drush-make-download
