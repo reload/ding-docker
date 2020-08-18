@@ -24,32 +24,15 @@ cd "$SCRIPT_DIR/../../"
 # runs.
 sudo echo ""
 
-if [[ $DOCKER_SYNC ]]; then
-    echoc "*** Forcing docker sync - if this is the first sync it will take minutes"
-    docker-sync start || true
-    docker-sync sync
-fi
-
-if [[ $DORY ]]; then
-    dory up
-fi
-
 # Clear all running containers.
 echoc "*** Removing existing containers"
 # The last docker-compose down -v removes various named volumes (datadir and
 # npm-cache)
-docker-compose kill && docker-compose rm -v -f && docker-compose down --remove-orphans -v
+docker-compose down --remove-orphans -v
 
 # Start up containers in the background and continue immediately
 echoc "*** Starting new containers"
-COMPOSER_OVERRIDE=
-[ -f "docker-compose.override.yml" ] && COMPOSER_OVERRIDE="-f docker-compose.override.yml"
-if [[ $DOCKER_SYNC ]]; then
-    cmd="docker-compose -f docker-compose.yml -f docker-compose-dev.yml ${COMPOSER_OVERRIDE} up --remove-orphans -d"
-else
-    cmd="docker-compose up --remove-orphans -d"
-fi
-eval "$cmd"
+docker-compose up -d
 
 # Perform the drupal-specific reset
 echoc "*** Resetting Drupal"
