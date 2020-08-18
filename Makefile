@@ -19,12 +19,12 @@ drush-make-download: ## Get .make files from ding2/ding2. Requires SVN.
 	svn export https://github.com/ding2/ding2.git/trunk/patches
 
 drush-make: drush-make-download ## Get .make files from ding2/ding2 and install them.  Requires SVN.
-	drush make --contrib-destination=profiles/ding2/ project-core.make web --working-copy
-	drush make --contrib-destination=profiles/ding2/ project.make web --working-copy --no-core
+	./vendor/bin/drush make --contrib-destination=profiles/ding2/ project-core.make web --working-copy
+	./vendor/bin/drush make --contrib-destination=profiles/ding2/ project.make web --working-copy --no-core
 
 drush-remake: drush-make-download ## Re-install .make files in an existing project. Notice: This only works in a project that already has a Drupal core.  Requires SVN.
-	drush make --contrib-destination=profiles/ding2/ project-core.make web --working-copy --no-core
-	drush make --contrib-destination=profiles/ding2/ project.make web --working-copy --no-core
+	./vendor/bin/drush make --contrib-destination=profiles/ding2/ project-core.make web --working-copy --no-core
+	./vendor/bin/drush make --contrib-destination=profiles/ding2/ project.make web --working-copy --no-core
 
 install-example-content:
 	docker-compose exec fpm sh -c "drush en -y ding_example_content ding_example_content_events ding_example_content_frontpage ding_example_content_groups ding_example_content_news ting_covers_placeholder"

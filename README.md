@@ -17,9 +17,6 @@ $ git clone https://github.com/reload/ding-docker.git
 $ cd ding-docker
 ```
 
-### Make sure you have a local drush that is BELOW version 9.
-This is necessary, as the ding2 project uses .make files, which became unsupported in Drush 9.
-
 **Notice** 
 You'll also need SVN to use the drush-make / drush-remake commands below.
 
