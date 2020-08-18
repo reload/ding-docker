@@ -12,18 +12,21 @@ help: ## Display a list of the public targets
 setup-git-remotes: ## Setting up the git remotes inside web/profiles/ding2.
 	cd web/profiles/ding2 && git remote add origin git@github.com:reload/ding2.git && git remote add upstream git@github.com:ding2/ding2.git && git fetch origin && git fetch upstream && git checkout master
 
+vendor/bin/drush: composer.lock
+	composer install
+
 drush-make-download: ## Get .make files from ding2/ding2. Requires SVN.
 	git clone --depth 1 git@github.com:ding2/ding2.git ding-tmp
 	rm -rf patches
 	mv ding-tmp/project-core.make ding-tmp/project.make ding-tmp/patches .
 	rm -rf ding-tmp
 
-drush-make: project-core.make ## Get .make files from ding2/ding2 and install them.
+drush-make: project-core.make vendor/bin/drush ## Get .make files from ding2/ding2 and install them.
 	rm -rf web
 	./vendor/bin/drush make --contrib-destination=profiles/ding2/ project-core.make web --working-copy
 	./vendor/bin/drush make --contrib-destination=profiles/ding2/ project.make web --working-copy --no-core
 
-drush-remake: project-core.make ## Re-install .make files in an existing project. Notice: This only works in a project that already has a Drupal core.
+drush-remake: project-core.make vendor/bin/drush ## Re-install .make files in an existing project. Notice: This only works in a project that already has a Drupal core.
 	./vendor/bin/drush make --contrib-destination=profiles/ding2/ project-core.make web --working-copy --no-core
 	./vendor/bin/drush make --contrib-destination=profiles/ding2/ project.make web --working-copy --no-core
 
