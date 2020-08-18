@@ -17,9 +17,6 @@ $ git clone https://github.com/reload/ding-docker.git
 $ cd ding-docker
 ```
 
-**Notice** 
-You'll also need SVN to use the drush-make / drush-remake commands below.
-
 Setup the .make files:
 ```sh
 $ make drush-make
