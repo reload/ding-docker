@@ -12,3 +12,6 @@ project-core.make
 
 # Ignore make/docker-compose last pull stamp.
 /.last-pull-*
+
+docker/db
+vendor

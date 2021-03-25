@@ -20,7 +20,7 @@ services:
       VIRTUAL_PORT: '80'
       VIRTUAL_HOST: ding2.docker
       MKCERT_DOMAINS: "ding2.docker mail.ding2.docker"
-      DRUSH_OPTIONS_URI: https://ding2.docker
+      DRUSH_OPTIONS_URI: http://ding2.docker
 
   fpm:
     image: reload/drupal-php7-fpm:7.0
@@ -35,15 +35,18 @@ services:
       - './docker/my_init.d/install-cron.sh:/etc/my_init.d/install-cron.sh'
     environment:
       PATH: '/var/www/vendor/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-      DRUSH_OPTIONS_URI: https://ding2.docker
+      DRUSH_OPTIONS_URI: http://ding2.docker
       PHP_SENDMAIL_PATH: /usr/local/bin/mhsendmail --smtp-addr="mailhog:1025"
       PHP_EXTRA_EXTENSIONS: 'memcache'
+      XDEBUG_MODE: "debug,develop"
+      XDEBUG_CONFIG: "client_host=host.docker.internal"
+      discover_client_host: "0"
 
   db:
     image: ding2/ding2-mysql:master
     ports:
       - '3306/tcp'
-    # If you want to use a local database dump, remove the volumes_from, place the
+    # If you want to use a local database dump, remove the image, place the
     # dump in ./docker/db and add the following
     # volumes:
     #   - './docker/db:/docker-entrypoint-initdb.d'

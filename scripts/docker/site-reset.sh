@@ -22,10 +22,16 @@ then
     exit 9999 # die with error code 9999
 fi
 
+# Determine if we have Dory.
+if [[ $(type -P "dory") ]]; then
+    echo "Starting dory.."
+    dory up
+fi
+
 mkdir -p "${FILES[@]}"
 find "${FILES[@]}" \! -uid 33  \! -print0 -name .gitkeep | sudo xargs -0 chmod 777
 
-sudo chmod -R 777 web/sites
+sudo chmod -R 777 web/sites/default
 
 docker-compose exec fpm sh -c  "cp /var/www/docker/docker.settings.php /var/www/web/sites/default/settings.php"
 
@@ -34,8 +40,10 @@ time docker-compose exec fpm sh -c  "\
   echo ' * Waiting php container to be ready' \
   && wait-for-it -t 60 localhost:9000 \
   && echo ' * Waiting for the database to be available' \
-  && wait-for-it -t 60 db:3306 \
+  && wait-for-it -t 600 db:3306 \
   && echo 'Site reset' \
+  && echo ' * Disable modules that conflict with local setup.' \
+  && drush dis -y ddb_cp \
   && echo ' * Update database (drush -y updatedb)' \
   && drush -y updatedb \
   && echo ' * Cache clear (drush cc all)' \
@@ -48,7 +56,4 @@ time docker-compose exec fpm sh -c  "\
   && drush cc all
   "
 
-echo "You now have a blank site. You can install example content using:"
-echo "$ make install-example-content"
-echo ""
-echo "Notice: you *may* need a VPN for some aspects of opensearch to work."
+"${SCRIPT_DIR}/done.sh"
