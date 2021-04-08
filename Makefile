@@ -3,6 +3,9 @@
 # =============================================================================
 .DEFAULT_GOAL := help
 
+ding_version?=master
+
+
 .PHONY: help
 help: ## Display a list of the public targets
 # Find lines that starts with a word-character, contains a colon and then a
@@ -11,27 +14,24 @@ help: ## Display a list of the public targets
 	@grep -E -h "^\w.*:.*##" $(MAKEFILE_LIST) | sed -e 's/\(.*\):.*##\(.*\)/\1	\2/'
 
 .PHONY: setup-git-remotes
-setup-git-remotes: ## Setting up the git remotes inside web/profiles/ding2.
+setup-git-remotes: ## Setting up the git remotes inside web/profiles/ding2. Define ding2 version with e.g. "make drush-make-download ding_version=7.x-6.2.1"
 	cd web/profiles/ding2 && git remote add origin git@github.com:reload/ding2.git && git remote add upstream git@github.com:ding2/ding2.git && git fetch origin && git fetch upstream && git checkout master
 
-vendor/bin/drush: composer.json composer.lock
-	composer install
-
 .PHONY: drush-make-download
-drush-make-download: ## Get .make files from ding2/ding2. Requires SVN.
-	git clone --depth 1 git@github.com:ding2/ding2.git ding-tmp
+drush-make-download: ## Get .make files from ding2/ding2. Define ding2 version with e.g. "make drush-make-download ding_version=7.x-6.2.1"
+	git clone --branch ${ding_version} --single-branch git@github.com:ding2/ding2.git ding-tmp
 	rm -rf patches
 	mv ding-tmp/project-core.make ding-tmp/project.make ding-tmp/patches .
 	rm -rf ding-tmp
 
 .PHONY: drush-make
-drush-make: project-core.make vendor/bin/drush ## Get .make files from ding2/ding2 and install them.
+drush-make: ## Get .make files from ding2/ding2 and install them.
 	rm -rf web
 	./vendor/bin/drush make --contrib-destination=profiles/ding2/ project-core.make web --working-copy
 	./vendor/bin/drush make --contrib-destination=profiles/ding2/ project.make web --working-copy --no-core
 
 .PHONY: drush-remake
-drush-remake: project-core.make vendor/bin/drush ## Re-install .make files in an existing project. Notice: This only works in a project that already has a Drupal core.
+drush-remake: ## Re-install .make files in an existing project. Notice: This only works in a project that already has a Drupal core.''
 	./vendor/bin/drush make --contrib-destination=profiles/ding2/ project-core.make web --working-copy --no-core
 	./vendor/bin/drush make --contrib-destination=profiles/ding2/ project.make web --working-copy --no-core
 
@@ -45,6 +45,8 @@ reset: _reset-container-state ## Stop all containers, reset their state and star
 .PHONY: up
 up:  ## Take the whole environment up without altering the existing state of the containers.
 	docker-compose up -d --remove-orphans
+	./scripts/docker/site-reset.sh
+
 
 # =============================================================================
 # HELPERS
